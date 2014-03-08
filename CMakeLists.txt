@@ -48,6 +48,10 @@ include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
 include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/include")
 
+# Build the lua library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/lua")
+include_directories("${PROJECT_SOURCE_DIR}/lib/lua/src")
+
 # Build the Wiiuse library
 # Note: wiiuse MUST be declared after irrlicht, since otherwise
 # (at least on VS) irrlicht will find wiiuse io.h file because
@@ -235,6 +239,7 @@ target_link_libraries(supertuxkart
     bulletmath
     enet
     stkirrlicht
+    liblua
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${IRRLICHT_XF86VM_LIBRARY}

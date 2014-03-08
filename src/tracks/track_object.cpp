@@ -96,6 +96,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     xml_node.get("scale",   &m_init_scale);
     xml_node.get("enabled", &m_enabled   );
 
+    // test node data
+    std::string scriptPath;
+    xml_node.get("scriptpath", &scriptPath);
+    printf("SCRIPTPATH: %s\n", scriptPath.c_str());
+
     m_interaction = "static";
     xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
