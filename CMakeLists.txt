@@ -65,7 +65,7 @@ endif()
 
 
 # Set include paths
-include_directories(${STK_SOURCE_DIR})
+include_directories(${STK_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}/lib/lua/)
 
 # These variables enable MSVC to find libraries located in "dependencies"
 if(MSVC)
@@ -240,6 +240,7 @@ target_link_libraries(supertuxkart
     enet
     stkirrlicht
     liblua
+    stdc++
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${IRRLICHT_XF86VM_LIBRARY}

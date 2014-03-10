@@ -27,6 +27,7 @@
 #include "utils/cpp2011.h"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+#include "scripting/script_engine.hpp"
 #include <string>
 
 class XMLNode;
@@ -72,6 +73,9 @@ protected:
 
     std::string                    m_type;
 
+    /** Script handler file for this track object. **/
+    std::string					   m_script_handler;
+
     bool                           m_soccer_ball;
     
     bool                           m_garage;
@@ -82,6 +86,8 @@ protected:
 
     ThreeDAnimation*               m_animator;
     
+    ScriptEngine*                  m_script_engine;
+
     void init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 
 public:

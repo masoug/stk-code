@@ -64,6 +64,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
     m_animator = NULL;
     m_physical_object = NULL;
     m_interaction = interaction;
+    m_script_engine = NULL;
 
     m_presentation = presentation;
 
@@ -91,15 +92,11 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     m_physical_object = NULL;
 
-    xml_node.get("xyz",     &m_init_xyz  );
-    xml_node.get("hpr",     &m_init_hpr  );
-    xml_node.get("scale",   &m_init_scale);
-    xml_node.get("enabled", &m_enabled   );
-
-    // test node data
-    std::string scriptPath;
-    xml_node.get("scriptpath", &scriptPath);
-    printf("SCRIPTPATH: %s\n", scriptPath.c_str());
+    xml_node.get("xyz",         &m_init_xyz  );
+    xml_node.get("hpr",         &m_init_hpr  );
+    xml_node.get("scale",       &m_init_scale);
+    xml_node.get("enabled",     &m_enabled   );
+    xml_node.get("scriptpath",  &m_script_handler);
 
     m_interaction = "static";
     xml_node.get("interaction", &m_interaction);
@@ -222,6 +219,15 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     if (type == "animation" || xml_node.hasChildNamed("curve"))
     {
         m_animator = new ThreeDAnimation(xml_node, this);
+        m_script_engine = new ScriptEngine();
+        Log::info("ScriptEngine", "Loading lua script: %s", m_script_handler.c_str());
+        if (!m_script_engine->loadScriptFile(m_script_handler)) {
+            delete m_script_engine;
+            m_script_engine = NULL;
+        } else {
+            m_script_engine->runScript();
+            m_script_engine->callFunction("initialize");
+        }
     }
 
     reset();
@@ -237,6 +243,10 @@ TrackObject::~TrackObject()
     delete m_presentation;
     delete m_animator;
     delete m_physical_object;
+    /**
+     * TODO: Figure out why this causes a segfault.
+     * if (m_script_engine) delete m_script_engine;
+    **/
 }   // ~TrackObject
 
 // ----------------------------------------------------------------------------
