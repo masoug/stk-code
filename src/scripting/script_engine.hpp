@@ -14,14 +14,19 @@
 
 #include "utils/no_copy.hpp"
 #include "utils/log.hpp"
+#include "utils/cpp2011.h"
 
 class ScriptEngine: public NoCopy {
 public:
     ScriptEngine();
 
+    void        registerFunction(std::string name, lua_CFunction funcptr);
+    void        onInitialize(void * ptr);
+    void        registerNumber(std::string name, double number);
     bool        loadScriptFile(std::string script_path);
     bool        runScript();
     bool        callFunction(std::string name);
+    lua_State*  getLuaState() { return m_lua_state; }
 
     virtual     ~ScriptEngine();
 

@@ -6,11 +6,41 @@
  */
 
 #include "scripting/script_engine.hpp"
+#include <stdint.h>
+
+
+extern "C" {
+int stkSetKartVelocity(lua_State *lua_state) {
+    printf("stkKartVelcity\n");
+    return 0;
+}
+}
 
 ScriptEngine::ScriptEngine()
 {
     m_lua_state = luaL_newstate();
     luaL_openlibs(m_lua_state);
+}
+
+void ScriptEngine::registerFunction(std::string name, lua_CFunction funcptr) {
+    lua_pushcfunction(m_lua_state, funcptr);
+    lua_setglobal(m_lua_state, name.c_str());
+}
+
+void ScriptEngine::onInitialize(void* ptr) {
+    lua_getglobal(m_lua_state, "onInitialize");
+    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
+    if (lua_pcall(m_lua_state, 1, 0, 0))
+    {
+        Log::error("ScriptEngine", "onInitialize handler error:");
+        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
+        lua_pop(m_lua_state, 1);
+    }
+}
+
+void ScriptEngine::registerNumber(std::string name, double number) {
+    lua_pushnumber(m_lua_state, number);
+    lua_setglobal(m_lua_state, name.c_str());
 }
 
 bool ScriptEngine::loadScriptFile(std::string script_path)

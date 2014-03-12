@@ -29,6 +29,7 @@
 #include "utils/vec3.hpp"
 #include "scripting/script_engine.hpp"
 #include <string>
+#include <map>
 
 class XMLNode;
 class ThreeDAnimation;
@@ -86,7 +87,9 @@ protected:
 
     ThreeDAnimation*               m_animator;
     
-    ScriptEngine*                  m_script_engine;
+    ScriptEngine*                       m_script_engine;
+    int                                 m_registry_id;
+    static std::map<int, TrackObject*>  SCRIPT_REGISTRY;
 
     void init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 

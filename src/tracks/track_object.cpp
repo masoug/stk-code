@@ -27,7 +27,49 @@
 #include "physics/physical_object.hpp"
 #include "race/race_manager.hpp"
 #include "utils/helpers.hpp"
+#include <iostream>
 
+extern "C" {
+
+static int grab(lua_State *lua_state) {
+    uintptr_t trk = lua_tointeger(lua_state, 1);
+    std::cout << "USERDATA: " << trk << std::endl;
+    TrackObject* trck_obj = (TrackObject*)trk;
+    std::cout << "TRACKOBECT*: " << trck_obj << std::endl;
+    std::cout << "GETDISTANCE: " << trck_obj->getDistance() << std::endl;
+    return 0;
+}
+
+static int trackobj_getdistance(lua_State *lua_state) {
+    return 0;
+}
+
+static const struct luaL_Reg trackobj_f[] =
+{
+    { "grab", grab },
+    { NULL, NULL }
+};
+
+static const struct luaL_Reg trackobj_m[] =
+{
+    { "getDistance", trackobj_getdistance},
+    { NULL, NULL}
+};
+
+void register_trackobj(lua_State *L)
+{
+    luaL_newmetatable(L, "stk.trackobj");
+    lua_pushstring(L, "__index");
+    lua_pushvalue(L, -2); /* pushes the metatable */
+    lua_settable(L, -3); /* metatable.__index = metatable */
+    luaL_setfuncs(L, trackobj_m, 0); /* member methods */
+
+    luaL_newlib(L, trackobj_f); /* library */
+    lua_setglobal(L, "trackobj");
+//    lua_register(L, "grab_trackobj", grab);
+}
+
+}
 
 /** A track object: any additional object on the track. This object implements
  *  a graphics-only representation, i.e. there is no physical representation.
@@ -220,13 +262,15 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     {
         m_animator = new ThreeDAnimation(xml_node, this);
         m_script_engine = new ScriptEngine();
+        register_trackobj(m_script_engine->getLuaState());
         Log::info("ScriptEngine", "Loading lua script: %s", m_script_handler.c_str());
         if (!m_script_engine->loadScriptFile(m_script_handler)) {
             delete m_script_engine;
             m_script_engine = NULL;
         } else {
             m_script_engine->runScript();
-            m_script_engine->callFunction("initialize");
+            m_script_engine->onInitialize(this);
+            std::cout << "THIS: " << this << std::endl;
         }
     }
 
@@ -277,7 +321,10 @@ void TrackObject::update(float dt)
 
     if (m_physical_object != NULL) m_physical_object->update(dt);
 
-    if (m_animator != NULL) m_animator->update(dt);
+    if (m_animator != NULL) {
+        m_animator->update(dt);
+        m_script_engine->callFunction("onUpdate");
+    }
 }   // update
 
 
