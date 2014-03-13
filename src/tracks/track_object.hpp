@@ -87,9 +87,7 @@ protected:
 
     ThreeDAnimation*               m_animator;
     
-    ScriptEngine*                       m_script_engine;
-    int                                 m_registry_id;
-    static std::map<int, TrackObject*>  SCRIPT_REGISTRY;
+    ScriptEngine*                  m_script_engine;
 
     void init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 

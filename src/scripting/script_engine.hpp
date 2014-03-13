@@ -12,6 +12,7 @@
 
 #include "lua.hpp"
 
+//#include "tracks/track_object.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/log.hpp"
 #include "utils/cpp2011.h"
@@ -21,7 +22,9 @@ public:
     ScriptEngine();
 
     void        registerFunction(std::string name, lua_CFunction funcptr);
-    void        onInitialize(void * ptr);
+    void        onInitialize(void* ptr);
+    void        onUpdate(void* ptr);
+    void        onKartCollision(void* this_kart, void* other_kart);
     void        registerNumber(std::string name, double number);
     bool        loadScriptFile(std::string script_path);
     bool        runScript();

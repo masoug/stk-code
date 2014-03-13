@@ -86,6 +86,48 @@
 #  include <math.h>
 #endif
 
+#include <iostream>
+
+extern "C" {
+
+static int kart_showstars(lua_State* lua_state)
+{
+    void* ptr = luaL_checkudata(lua_state, 1, "stk.kart");
+    luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.kart\" expected.");
+    double duration = luaL_checknumber(lua_state, 2);
+    Kart* kart = *((Kart**)ptr);
+    kart->showStarEffect(duration);
+    return 0;
+}
+
+/* Implement speed next! */
+
+static const struct luaL_Reg kart_f[] =
+{
+    { NULL, NULL }
+};
+
+static const struct luaL_Reg kart_m[] =
+{
+    { "showStars", kart_showstars },
+    { NULL, NULL}
+};
+
+void register_kart(lua_State *L)
+{
+    luaL_newmetatable(L, "stk.kart");
+    lua_pushstring(L, "__index");
+    lua_pushvalue(L, -2); /* pushes the metatable */
+    lua_settable(L, -3); /* metatable.__index = metatable */
+    luaL_setfuncs(L, kart_m, 0); /* member methods */
+
+    luaL_newlib(L, kart_f); /* library */
+    lua_setglobal(L, "kart");
+//    lua_register(L, "grab_trackobj", grab);
+}
+
+}
+
 /** The kart constructor.
  *  \param ident  The identifier for the kart model to use.
  *  \param position The position (or rank) for this kart (between 1 and
@@ -100,6 +142,7 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 #  pragma warning(1:4355)
 #endif
 {
+    m_script_engine        = NULL;
     m_max_speed            = new MaxSpeed(this);
     m_terrain_info         = new TerrainInfo();
     m_powerup              = new Powerup(this);
@@ -167,6 +210,13 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 
 }   // Kart
 
+void Kart::onKartCollision(void* this_kart, void* other_kart) {
+    if (m_script_engine == NULL)
+        return;
+
+    m_script_engine->onKartCollision(this_kart, other_kart);
+}
+
 // -----------------------------------------------------------------------------
 /** This is a second initialisation phase, necessary since in the constructor
  *  virtual functions are not called for any superclasses.
@@ -174,6 +224,13 @@ Kart::Kart (const std::string& ident, unsigned int world_kart_id,
 */
 void Kart::init(RaceManager::KartType type)
 {
+    if (m_kart_model->getScriptFile().length() > 0)
+    {
+        m_script_engine = new ScriptEngine();
+        m_script_engine->loadScriptFile(m_kart_model->getScriptFile());
+        m_script_engine->runScript();
+        register_kart(m_script_engine->getLuaState());
+    }
     // In multiplayer mode, sounds are NOT positional
     if (race_manager->getNumLocalPlayers() > 1)
     {

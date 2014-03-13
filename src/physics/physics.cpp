@@ -23,6 +23,7 @@
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "karts/abstract_kart.hpp"
+#include "karts/kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
 #include "items/flyable.hpp"
@@ -322,6 +323,8 @@ void Physics::KartKartCollision(AbstractKart *kart_a,
                                 AbstractKart *kart_b,
                                 const Vec3 &contact_point_b)
 {
+    static_cast<Kart*>(kart_a)->onKartCollision(kart_a, kart_b);
+    static_cast<Kart*>(kart_b)->onKartCollision(kart_b, kart_a);
     // Only one kart needs to handle the attachments, it will
     // fix the attachments for the other kart.
     kart_a->crashed(kart_b, /*handle_attachments*/true);

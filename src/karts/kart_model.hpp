@@ -203,7 +203,10 @@ private:
     float m_kart_highest_point;
 
     /** Smallest coordinate on up axis. */
-    float m_kart_lowest_point; 
+    float m_kart_lowest_point;
+
+    /** Script filenames **/
+    std::string     m_script_file;
 
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
@@ -247,6 +250,8 @@ public:
     /** Returns the mesh of the wheel for this kart. */
     scene::IMesh* getWheelModel(const int i) const
                              { assert(i>=0 && i<4); return m_wheel_model[i]; }
+    // ------------------------------------------------------------------------
+    std::string getScriptFile() const { return m_script_file; }
     // ------------------------------------------------------------------------
     /** Since karts might be animated, we might need to know which base frame
      *  to use. */

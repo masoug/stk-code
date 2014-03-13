@@ -33,6 +33,7 @@
 #include "karts/kart_properties.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
+#include "scripting/script_engine.hpp"
 
 class btKart;
 class btUprightConstraint;
@@ -66,6 +67,9 @@ class Kart : public AbstractKart
 {
     friend class Skidding;
 private:
+    /** Scripting engine!!! **/
+    ScriptEngine*       m_script_engine;
+
     /** Handles speed increase and capping due to powerup, terrain, ... */
     MaxSpeed           *m_max_speed;
 
@@ -269,6 +273,7 @@ public:
 
     virtual bool   playCustomSFX    (unsigned int type);
     virtual void   setController(Controller *controller);
+    void           onKartCollision(void* this_kart, void* other_kart);
 
     // ========================================================================
     // Powerup related functions.

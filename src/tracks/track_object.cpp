@@ -41,6 +41,18 @@ static int grab(lua_State *lua_state) {
 }
 
 static int trackobj_getdistance(lua_State *lua_state) {
+    void* ptr = luaL_checkudata(lua_state, 1, "stk.trackobj");
+    luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.trackobj\" expected.");
+    TrackObject* trkobj = (TrackObject*)ptr;
+    lua_pushnumber(lua_state, trkobj->getDistance());
+    return 1;
+}
+
+static int trackobj_resetanimation(lua_State *lua_state) {
+    void* ptr = luaL_checkudata(lua_state, 1, "stk.trackobj");
+    luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.trackobj\" expected.");
+    TrackObject* trkobj = (TrackObject*)ptr;
+    trkobj->getAnimator()->reset();
     return 0;
 }
 
@@ -53,6 +65,7 @@ static const struct luaL_Reg trackobj_f[] =
 static const struct luaL_Reg trackobj_m[] =
 {
     { "getDistance", trackobj_getdistance},
+    { "resetAnimation", trackobj_resetanimation },
     { NULL, NULL}
 };
 
@@ -270,7 +283,6 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         } else {
             m_script_engine->runScript();
             m_script_engine->onInitialize(this);
-            std::cout << "THIS: " << this << std::endl;
         }
     }
 
@@ -323,7 +335,7 @@ void TrackObject::update(float dt)
 
     if (m_animator != NULL) {
         m_animator->update(dt);
-        m_script_engine->callFunction("onUpdate");
+        m_script_engine->onUpdate(this);
     }
 }   // update
 

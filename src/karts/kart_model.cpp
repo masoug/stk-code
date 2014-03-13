@@ -139,6 +139,7 @@ KartModel::KartModel(bool is_master)
 void KartModel::loadInfo(const XMLNode &node)
 {
     node.get("model-file", &m_model_filename);
+    node.get("script-file", &m_script_file);
     if(const XMLNode *animation_node=node.getNode("animations"))
     {
         animation_node->get("left",           &m_animation_frame[AF_LEFT]      );
@@ -287,6 +288,7 @@ KartModel* KartModel::makeCopy()
     km->m_animated_node     = NULL;
     km->m_hat_offset        = m_hat_offset;
     km->m_hat_name          = m_hat_name;
+    km->m_script_file       = m_script_file;
     
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];

@@ -6,15 +6,9 @@
  */
 
 #include "scripting/script_engine.hpp"
+#include "tracks/track_object.hpp"
+#include "karts/kart.hpp"
 #include <stdint.h>
-
-
-extern "C" {
-int stkSetKartVelocity(lua_State *lua_state) {
-    printf("stkKartVelcity\n");
-    return 0;
-}
-}
 
 ScriptEngine::ScriptEngine()
 {
@@ -27,12 +21,57 @@ void ScriptEngine::registerFunction(std::string name, lua_CFunction funcptr) {
     lua_setglobal(m_lua_state, name.c_str());
 }
 
-void ScriptEngine::onInitialize(void* ptr) {
+void ScriptEngine::onInitialize(void* ptr)
+{
     lua_getglobal(m_lua_state, "onInitialize");
-    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
+    TrackObject **pptr = (TrackObject**) lua_newuserdata(m_lua_state,
+            sizeof(TrackObject*));
+    *pptr = (TrackObject*) ptr;
+    luaL_getmetatable(m_lua_state, "stk.trackobj");
+    lua_setmetatable(m_lua_state, -2);
+//    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
     if (lua_pcall(m_lua_state, 1, 0, 0))
     {
         Log::error("ScriptEngine", "onInitialize handler error:");
+        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
+        lua_pop(m_lua_state, 1);
+    }
+}
+
+void ScriptEngine::onUpdate(void* ptr)
+{
+    lua_getglobal(m_lua_state, "onUpdate");
+    TrackObject **pptr = (TrackObject**) lua_newuserdata(m_lua_state,
+            sizeof(TrackObject*));
+    *pptr = (TrackObject*) ptr;
+    luaL_getmetatable(m_lua_state, "stk.trackobj");
+    lua_setmetatable(m_lua_state, -2);
+    //    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
+    if (lua_pcall(m_lua_state, 1, 0, 0))
+    {
+        Log::error("ScriptEngine", "onUpdate handler error:");
+        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
+        lua_pop(m_lua_state, 1);
+    }
+}
+
+void ScriptEngine::onKartCollision(void* this_kart, void* other_kart)
+{
+    lua_getglobal(m_lua_state, "onKartCollision");
+    Kart **pptr_this = (Kart**) lua_newuserdata(m_lua_state,
+            sizeof(Kart*));
+    *pptr_this = (Kart*) this_kart;
+    luaL_getmetatable(m_lua_state, "stk.kart");
+    lua_setmetatable(m_lua_state, -2);
+    Kart **pptr_other = (Kart**) lua_newuserdata(m_lua_state,
+            sizeof(Kart*));
+    *pptr_other = (Kart*) other_kart;
+    luaL_getmetatable(m_lua_state, "stk.kart");
+    lua_setmetatable(m_lua_state, -2);
+    //    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
+    if (lua_pcall(m_lua_state, 2, 0, 0))
+    {
+        Log::error("ScriptEngine", "onUpdate handler error:");
         Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
         lua_pop(m_lua_state, 1);
     }
