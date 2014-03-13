@@ -17,42 +17,42 @@ ScriptEngine::ScriptEngine()
 }
 
 void ScriptEngine::registerFunction(std::string name, lua_CFunction funcptr) {
-    lua_pushcfunction(m_lua_state, funcptr);
-    lua_setglobal(m_lua_state, name.c_str());
+//    lua_pushcfunction(m_lua_state, funcptr);
+//    lua_setglobal(m_lua_state, name.c_str());
 }
 
 void ScriptEngine::onInitialize(void* ptr)
 {
-    lua_getglobal(m_lua_state, "onInitialize");
-    TrackObject **pptr = (TrackObject**) lua_newuserdata(m_lua_state,
-            sizeof(TrackObject*));
-    *pptr = (TrackObject*) ptr;
-    luaL_getmetatable(m_lua_state, "stk.trackobj");
-    lua_setmetatable(m_lua_state, -2);
-//    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
-    if (lua_pcall(m_lua_state, 1, 0, 0))
-    {
-        Log::error("ScriptEngine", "onInitialize handler error:");
-        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
-        lua_pop(m_lua_state, 1);
-    }
+//    lua_getglobal(m_lua_state, "onInitialize");
+//    TrackObject **pptr = (TrackObject**) lua_newuserdata(m_lua_state,
+//            sizeof(TrackObject*));
+//    *pptr = (TrackObject*) ptr;
+//    luaL_getmetatable(m_lua_state, "stk.trackobj");
+//    lua_setmetatable(m_lua_state, -2);
+////    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
+//    if (lua_pcall(m_lua_state, 1, 0, 0))
+//    {
+//        Log::error("ScriptEngine", "onInitialize handler error:");
+//        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
+//        lua_pop(m_lua_state, 1);
+//    }
 }
 
 void ScriptEngine::onUpdate(void* ptr)
 {
-    lua_getglobal(m_lua_state, "onUpdate");
-    TrackObject **pptr = (TrackObject**) lua_newuserdata(m_lua_state,
-            sizeof(TrackObject*));
-    *pptr = (TrackObject*) ptr;
-    luaL_getmetatable(m_lua_state, "stk.trackobj");
-    lua_setmetatable(m_lua_state, -2);
-    //    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
-    if (lua_pcall(m_lua_state, 1, 0, 0))
-    {
-        Log::error("ScriptEngine", "onUpdate handler error:");
-        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
-        lua_pop(m_lua_state, 1);
-    }
+//    lua_getglobal(m_lua_state, "onUpdate");
+//    TrackObject **pptr = (TrackObject**) lua_newuserdata(m_lua_state,
+//            sizeof(TrackObject*));
+//    *pptr = (TrackObject*) ptr;
+//    luaL_getmetatable(m_lua_state, "stk.trackobj");
+//    lua_setmetatable(m_lua_state, -2);
+//    //    lua_pushinteger(m_lua_state, (uintptr_t)ptr);
+//    if (lua_pcall(m_lua_state, 1, 0, 0))
+//    {
+//        Log::error("ScriptEngine", "onUpdate handler error:");
+//        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
+//        lua_pop(m_lua_state, 1);
+//    }
 }
 
 void ScriptEngine::onKartCollision(void* this_kart, void* other_kart)
@@ -78,8 +78,8 @@ void ScriptEngine::onKartCollision(void* this_kart, void* other_kart)
 }
 
 void ScriptEngine::registerNumber(std::string name, double number) {
-    lua_pushnumber(m_lua_state, number);
-    lua_setglobal(m_lua_state, name.c_str());
+//    lua_pushnumber(m_lua_state, number);
+//    lua_setglobal(m_lua_state, name.c_str());
 }
 
 bool ScriptEngine::loadScriptFile(std::string script_path)
@@ -110,14 +110,14 @@ bool ScriptEngine::runScript()
 
 bool ScriptEngine::callFunction(std::string name)
 {
-    lua_getglobal(m_lua_state, name.c_str());
-    if (lua_pcall(m_lua_state, 0, 0, 0))
-    {
-        Log::error("ScriptEngine", "Error executing lua script.");
-        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
-        lua_pop(m_lua_state, 1);
-        return false;
-    }
+//    lua_getglobal(m_lua_state, name.c_str());
+//    if (lua_pcall(m_lua_state, 0, 0, 0))
+//    {
+//        Log::error("ScriptEngine", "Error executing lua script.");
+//        Log::error("ScriptEngine", "%s", lua_tostring(m_lua_state, -1));
+//        lua_pop(m_lua_state, 1);
+//        return false;
+//    }
     return true;
 }
 

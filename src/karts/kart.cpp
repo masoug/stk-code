@@ -100,7 +100,13 @@ static int kart_showstars(lua_State* lua_state)
     return 0;
 }
 
-/* Implement speed next! */
+static int kart_getspeed(lua_State* lua_state) {
+    void* ptr = luaL_checkudata(lua_state, 1, "stk.kart");
+    luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.kart\" expected.");
+    Kart* kart = *((Kart**)ptr);
+    lua_pushnumber(lua_state, kart->getSpeed());
+    return 1;
+}
 
 static const struct luaL_Reg kart_f[] =
 {
@@ -110,6 +116,7 @@ static const struct luaL_Reg kart_f[] =
 static const struct luaL_Reg kart_m[] =
 {
     { "showStars", kart_showstars },
+    { "getSpeed" , kart_getspeed },
     { NULL, NULL}
 };
 
