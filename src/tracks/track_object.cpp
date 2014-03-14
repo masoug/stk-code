@@ -31,41 +31,26 @@
 
 extern "C" {
 
-static int grab(lua_State *lua_state) {
-    uintptr_t trk = lua_tointeger(lua_state, 1);
-    std::cout << "USERDATA: " << trk << std::endl;
-    TrackObject* trck_obj = (TrackObject*)trk;
-    std::cout << "TRACKOBECT*: " << trck_obj << std::endl;
-    std::cout << "GETDISTANCE: " << trck_obj->getDistance() << std::endl;
-    return 0;
-}
-
-static int trackobj_getdistance(lua_State *lua_state) {
+static int trackobj_get_presentation(lua_State* lua_state) {
     void* ptr = luaL_checkudata(lua_state, 1, "stk.trackobj");
     luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.trackobj\" expected.");
-    TrackObject* trkobj = (TrackObject*)ptr;
-    lua_pushnumber(lua_state, trkobj->getDistance());
+    TrackObject* trk_obj = *((TrackObject**)ptr);
+    TrackObjectPresentation** tropp =
+            (TrackObjectPresentation**)lua_newuserdata(lua_state, sizeof(TrackObjectPresentation*));
+    *tropp = trk_obj->getPresentation<TrackObjectPresentation>();
+    luaL_getmetatable(lua_state, "stk.trackobjpres");
+    lua_setmetatable(lua_state, -2);
     return 1;
-}
-
-static int trackobj_resetanimation(lua_State *lua_state) {
-    void* ptr = luaL_checkudata(lua_state, 1, "stk.trackobj");
-    luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.trackobj\" expected.");
-    TrackObject* trkobj = (TrackObject*)ptr;
-    trkobj->getAnimator()->reset();
-    return 0;
 }
 
 static const struct luaL_Reg trackobj_f[] =
 {
-    { "grab", grab },
     { NULL, NULL }
 };
 
 static const struct luaL_Reg trackobj_m[] =
 {
-    { "getDistance", trackobj_getdistance},
-    { "resetAnimation", trackobj_resetanimation },
+    { "getPresentation", trackobj_get_presentation },
     { NULL, NULL}
 };
 
@@ -274,15 +259,23 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     if (type == "animation" || xml_node.hasChildNamed("curve"))
     {
         m_animator = new ThreeDAnimation(xml_node, this);
+    }
+
+    if (m_script_handler.length() > 0)
+    {
         m_script_engine = new ScriptEngine();
+        register_track_object_presentation(m_script_engine->getLuaState());
         register_trackobj(m_script_engine->getLuaState());
-        Log::info("ScriptEngine", "Loading lua script: %s", m_script_handler.c_str());
-        if (!m_script_engine->loadScriptFile(m_script_handler)) {
+        Log::info("ScriptEngine", "Loading lua script: %s",
+                m_script_handler.c_str());
+        if (!m_script_engine->loadScriptFile(m_script_handler))
+        {
             delete m_script_engine;
             m_script_engine = NULL;
-        } else {
+        }
+        else
+        {
             m_script_engine->runScript();
-            m_script_engine->onInitialize(this);
         }
     }
 
@@ -333,10 +326,9 @@ void TrackObject::update(float dt)
 
     if (m_physical_object != NULL) m_physical_object->update(dt);
 
-    if (m_animator != NULL) {
-        m_animator->update(dt);
-        m_script_engine->onUpdate(this);
-    }
+    if (m_animator != NULL) m_animator->update(dt);
+
+    if (m_script_engine != NULL) m_script_engine->onUpdate(this, "stk.trackobj");
 }   // update
 
 

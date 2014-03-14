@@ -36,6 +36,7 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/lod_node_loader.hpp"
 #include "tracks/track.hpp"
+#include "scripting/script_engine.hpp"
 
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
@@ -44,6 +45,42 @@
 #include <IParticleSystemSceneNode.h>
 #include <ILightSceneNode.h>
 #include <IMeshManipulator.h>
+
+extern "C" {
+
+static int trop_set_enable(lua_State* lua_state) {
+    void* ptr = luaL_checkudata(lua_state, 1, "stk.trackobjpres");
+    luaL_argcheck(lua_state, ptr != NULL, 1, "\"stk.trackobjpres\" expected.");
+    TrackObjectPresentation* trk_obj = *((TrackObjectPresentation**)ptr);
+    trk_obj->setEnable(lua_toboolean(lua_state, 2));
+    return 0;
+}
+
+static const struct luaL_Reg trackobj_f[] =
+{
+    { NULL, NULL }
+};
+
+static const struct luaL_Reg trackobj_m[] =
+{
+    { "setEnable", trop_set_enable },
+    { NULL, NULL}
+};
+
+void register_track_object_presentation(lua_State *L)
+{
+    luaL_newmetatable(L, "stk.trackobjpres");
+    lua_pushstring(L, "__index");
+    lua_pushvalue(L, -2); /* pushes the metatable */
+    lua_settable(L, -3); /* metatable.__index = metatable */
+    luaL_setfuncs(L, trackobj_m, 0); /* member methods */
+
+    luaL_newlib(L, trackobj_f); /* library */
+    lua_setglobal(L, "trackobjpres");
+//    lua_register(L, "grab_trackobj", grab);
+}
+
+}
 
 // ----------------------------------------------------------------------------
 

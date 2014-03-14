@@ -23,7 +23,7 @@ public:
 
     void        registerFunction(std::string name, lua_CFunction funcptr);
     void        onInitialize(void* ptr);
-    void        onUpdate(void* ptr);
+    void        onUpdate(void* ptr, const char* mtable);
     void        onKartCollision(void* this_kart, void* other_kart);
     void        registerNumber(std::string name, double number);
     bool        loadScriptFile(std::string script_path);

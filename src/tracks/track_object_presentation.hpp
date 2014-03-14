@@ -33,6 +33,7 @@ using namespace irr;
 #include "utils/cpp2011.h"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
+#include "scripting/script_engine.hpp"
 #include <string>
 
 class XMLNode;
@@ -41,6 +42,10 @@ class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 class LodNodeLoader;
+
+extern "C" {
+void register_track_object_presentation(lua_State *L);
+}
 
 /**
  * \ingroup tracks
