@@ -263,6 +263,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     if (m_script_handler.length() > 0)
     {
+        std::cout << "SCRIPTHANDLER: " << m_script_handler << std::endl;
         m_script_engine = new ScriptEngine();
         register_track_object_presentation(m_script_engine->getLuaState());
         register_trackobj(m_script_engine->getLuaState());
@@ -277,6 +278,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         {
             m_script_engine->runScript();
         }
+    } else {
+        m_script_engine = NULL;
     }
 
     reset();
@@ -328,6 +331,7 @@ void TrackObject::update(float dt)
 
     if (m_animator != NULL) m_animator->update(dt);
 
+//    if (m_script_handler.length() > 0) m_script_engine->onUpdate(this, "stk.trackobj");
     if (m_script_engine != NULL) m_script_engine->onUpdate(this, "stk.trackobj");
 }   // update
 
